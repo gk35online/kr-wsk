@@ -235,7 +235,7 @@ footer .lbl,.todo .lbl{font-size:calc(var(--u)*1.3)}
 <script>
 {
 const DAYS={25:'Wednesday 25',26:'Thursday 26',27:'Friday 27',28:'Saturday 28',29:'Sunday 29'};
-const COL={OKN:'var(--okn)',OKNJ:'var(--oknj)',OK:'var(--ok)',OKJ:'var(--okj)'};
+const COL={OKN:'var(--okn)',OKNJ:'var(--oknj)',OK:'var(--ok)',OKJ:'var(--okj)','MINI U10':'#6b6e75','MINI GR3':'#6b6e75',KZ2:'#6b6e75'};
 const CL=['OKN','OKNJ','OK','OKJ'];
 const E=[];
 const add=(d,t,cls,sec,label,dur,extra)=>E.push({d,t,cls:[].concat(cls),sec,label,dur,extra:extra||''});
@@ -270,6 +270,26 @@ heat(28,[['09:30','OKN','M2'],['09:50','OKNJ','A–C'],['10:10','OKNJ','B–D'],
 [['12:05','OKN','12:00'],['12:35','OKNJ','12:30'],['14:35','OKJ','14:30'],['15:05','OK','15:00']]
  .forEach(([t,c,g])=>add(29,t,c,'Finals','FINAL',20,'grid '+g));
 
+// ---- Other classes (Mini U10, Mini Gr.3, KZ2): hidden from the screen, used only to measure the delay ----
+{const H=(d,t,c,sec,label,dur,extra)=>{add(d,t,c,sec,label,dur,extra);E[E.length-1].hid=true};
+ const fpo={'MINI U10':[['503–599','08:39','11:02','13:25','15:48'],['600–683','08:52','11:15','13:38','16:01']],
+  'MINI GR3':[['Odd numbers','09:05','11:28','13:51','16:14'],['Even numbers','09:18','11:41','14:04','16:27']],
+  'KZ2':[['All','10:10','12:33','14:56','17:19']]};
+ for(const d of [25,26])for(const c in fpo)for(const [g,...ts] of fpo[c])ts.forEach((t,i)=>H(d,t,c,'Free practice',`Free practice · turn ${i+1}`,c==='KZ2'&&i===3?8:10,g));
+ [['08:24','MINI U10','Group 1'],['08:32','MINI U10','Group 2'],['08:40','MINI U10','Group 3'],['08:48','MINI GR3','Group 1'],['08:56','MINI GR3','Group 2'],['09:36','KZ2','Group 1']]
+  .forEach(([t,c,g])=>H(27,t,c,'Official free practice','Official free practice 5’',5,g));
+ [['10:20','MINI U10','Group 1'],['10:30','MINI U10','Group 2'],['10:40','MINI U10','Group 3'],['10:50','MINI GR3','Group 1'],['11:00','MINI GR3','Group 2'],['11:50','KZ2','Group 1']]
+  .forEach(([t,c,g])=>H(27,t,c,'Qualifying','Timed practice 6’',6,g));
+ const hh=(d,l)=>l.forEach(([t,c,g])=>H(d,t,c,'Heats',`Heat ${g}`,12,'race'));
+ hh(27,[['13:40','MINI U10','C–E'],['13:55','MINI U10','B–D'],['14:10','MINI GR3','A–B'],['14:25','MINI GR3','C–D'],['16:00','KZ2','M1'],['16:20','MINI U10','A–E'],['16:35','MINI U10','C–D']]);
+ [['08:24','MINI U10','503–599'],['08:32','MINI U10','600–683'],['08:40','MINI GR3','Odd numbers'],['08:48','MINI GR3','Even numbers'],['09:20','KZ2','All']]
+  .forEach(([t,c,g])=>H(28,t,c,'Warm up','Warm up 5’',5,g));
+ hh(28,[['10:30','MINI U10','A–B'],['10:45','MINI U10','D–E'],['11:00','MINI GR3','A–C'],['11:15','MINI GR3','B–D'],['12:50','KZ2','M2'],
+  ['14:10','MINI U10','A–C'],['14:25','MINI U10','B–E'],['14:40','MINI GR3','A–D'],['14:55','MINI GR3','B–C'],['16:30','MINI U10','A–D'],['16:45','MINI U10','B–C'],['17:00','KZ2','M3']]);
+ [['09:10','MINI U10',' A'],['09:25','MINI U10',' B'],['09:40','MINI GR3',' A'],['09:55','MINI GR3',' B'],['11:30','KZ2','']]
+  .forEach(([t,c,g])=>H(29,t,c,'Prefinals','Prefinal'+g,12,'race'));
+ [['13:35','MINI U10','13:30'],['14:05','MINI GR3','14:00'],['15:35','KZ2','15:30']]
+  .forEach(([t,c,g])=>H(29,t,c,'Finals','FINAL',20,'grid '+g));}
 const pad=n=>String(n).padStart(2,'0');
 const sub5=t=>{let[h,m]=t.split(':').map(Number);m-=5;if(m<0){m+=60;h--}return pad(h)+':'+pad(m)};
 E.forEach(e=>{e.at=new Date(`2026-11-${e.d}T${e.t}:00+01:00`).getTime();e.end=e.at+e.dur*60000;
@@ -341,6 +361,11 @@ const saveLT=()=>{try{localStorage.setItem('wsk-lt-v2',JSON.stringify({delay:LT.
 E.forEach((e,i)=>e.id=i);
 const strip=h=>String(h||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
 function liveClass(t){
+ {const v=' '+String(t).toUpperCase().replace(/[^A-Z0-9]+/g,' ')+' ';
+  if(/ KZ ?2 /.test(v))return 'KZ2';
+  if(/ U ?10 | UNDER 10 /.test(v))return 'MINI U10';
+  if(/ GR ?3 | GRUPPO 3 | GROUP 3 /.test(v)&&/ MINI /.test(v))return 'MINI GR3';
+  if(/ MINI /.test(v))return / GR /.test(v)?'MINI GR3':'MINI U10';}
  // Normalise the way Apex writes classes: "OK-N", "OK-N Junior", "OK-NJ", "OKN-J", "OK Junior", "OK-J"...
  let u=' '+String(t).toUpperCase().replace(/[^A-Z0-9]+/g,' ')+' ';
  u=u.replace(/ OK N(?= )/g,' OKN').replace(/ OK NJ(?= )/g,' OKNJ').replace(/ OKN J(UNIOR)?(?= )/g,' OKNJ')
@@ -372,11 +397,11 @@ function parseTitle(t){const u=' '+t.toUpperCase().replace(/[–—]/g,'-').repl
  else if(/PRACTICE|PROVE|LIBERE|TEST/.test(u))r.sec='Free practice';
  let m;
  if(m=u.match(/(?:GROUP|GRUPPO|SERIE|SERIES|GR\.?)\s*(\d)/)||u.match(/(\d)\s*\^?\s*(?:SERIE|SERIES|GROUP|GRUPPO)/))r.grp='Group '+m[1];
- if(/\bODD\b|DISPARI/.test(u))r.grp='Odd numbers';else if(/\bEVEN\b|\bPARI\b/.test(u))r.grp='Even numbers';
- if(m=u.match(/\b([A-D])\s*-\s*([A-D])\b/))r.heat=m[1]+'–'+m[2];
+ if(/\bODD\b|DISPARI|IMPAIR/.test(u))r.grp='Odd numbers';else if(/\bEVEN\b|\bPARI\b|\bPAIRS?\b/.test(u))r.grp='Even numbers';
+ if(m=u.match(/\b([A-E])\s*-\s*([A-E])\b/))r.heat=m[1]+'–'+m[2];
  if(m=u.match(/\bM\s?([123])\b/))r.heat='M'+m[1];
  if(r.sec==='Prefinals'&&(m=u.match(/PRE ?-?FINAL[E]?\s+([AB])\b/)))r.heat=m[1];
- if(m=u.match(/\b(7\d\d)\s*-\s*(7\d\d)\b/))r.grp='701–768';else if(/\b77\d\s*-\s*9\d\d\b/.test(u))r.grp='776–924';
+ if(m=u.match(/\b([5-9]\d\d)\s*-\s*(\d{3})\b/))r.grp=m[1]+'–'+m[2];
  if(m=u.match(/(?:TURN|TURNO|SESSION|FREE PRACTICE|PRACTICE|PROVE LIBERE)\s*(\d)/))r.turn=m[1];
  return r}
 function startSession(cls,title,at){
@@ -435,6 +460,8 @@ function handle(k,a,v){
 // ---------- Live timing grid: positions of KR drivers ----------
 const G={mode:'',cols:{},rows:{},cells:{},cls:{},stamp:0};
 const KRNUM={};for(const c in KR)KR[c].forEach(d=>KRNUM[d[0]]={c,name:d[2],first:d[1]});
+// KR drivers in classes without a countdown board: live timing panel only
+KRNUM[503]={c:'MINI U10',name:'Wolff',first:'Jack'};
 function parseGrid(html){
  const doc=new DOMParser().parseFromString('<table>'+html+'</table>','text/html');
  G.cols={};G.rows={};G.cells={};G.cls={};
@@ -541,7 +568,7 @@ function tick(){
    ${(k=>`<div class="drv">${k.list.length?k.list.map(d=>`<span><b>${d[0]}</b>${esc(d[2])}</span>`).join(''):'<em>No KR drivers in this group</em>'}</div>`)(krFor(cur,c))}
    <div class="cdrow"><div class="cd">${live?dur(rem!=null?rem:cur.f-now):dur(cur.s-now)}</div><div class="state"><span class="dot"></span>${live?(timed?'On track · live':(cur.extra==='race'||cur.extra.startsWith('grid')?'Racing · est.':'On track')):soon?'Starting soon':cur.dl?'Until start · adj.':'Until start'}</div></div>
    <div class="then">${n2?`Then <b>${esc(n2.label)}${isG(n2)&&n2.extra!=='All'?' · '+esc(n2.extra):''}</b> · ${n2.d===todayD(now)?'':DAY3[n2.d]+' '}${hm(n2.s)}`:'Last session'}</section>`}).join('');
- nx.innerHTML=E.filter(e=>e.sec!=='Admin'&&e.s>now).sort((a,b)=>a.s-b.s).slice(0,8).map(e=>
+ nx.innerHTML=E.filter(e=>!e.hid&&e.sec!=='Admin'&&e.s>now).sort((a,b)=>a.s-b.s).slice(0,8).map(e=>
   `<div><b>${e.d===todayD(now)?'':DAY3[e.d]+' '}${hm(e.s)}</b><span class="tag" style="--c:${COL[e.cls[0]]}">${e.cls[0]}</span>${esc(e.label)}${isG(e)&&e.extra!=='All'?' · '+esc(e.extra):''}</div>`).join('');
 }
 connectLT();
