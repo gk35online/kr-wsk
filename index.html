@@ -187,6 +187,28 @@ footer .lbl,.todo .lbl{font-size:calc(var(--u)*1.3)}
 /* focus */
 :focus-visible{outline:2px solid var(--kr-yellow);outline-offset:2px}
 #fs:focus-visible{outline:2px solid var(--kr-yellow);outline-offset:2px}
+
+/* sector colours (dots only, no times): purple = best of session, green = personal best, yellow = slower */
+.krt th.sx{text-align:center}
+.krt td.sx{text-align:center;width:1%;white-space:nowrap}
+.sd{display:inline-block;width:calc(var(--u)*1.25);height:calc(var(--u)*1.25);border-radius:50%;margin:0 calc(var(--u)*.18);
+ border:2px solid var(--line);background:transparent;vertical-align:middle}
+.sd.tb{background:#b04dff;border-color:#b04dff}
+.sd.ti{background:#2ecc71;border-color:#2ecc71}
+.sd.tn{background:#ffcc00;border-color:#ffcc00}
+.sd.to{background:#59aee4;border-color:#59aee4}
+.sd.tr,.sd.x{background:var(--mute);border-color:var(--mute)}
+
+/* laps done */
+.krt td.lp,.krt th.lp{text-align:right;width:1%;white-space:nowrap}
+.krt td.lp{color:var(--mute);font-weight:700}
+
+/* tighter KR table so name, sectors, gap, best lap and laps all fit */
+.krt th{letter-spacing:.1em;padding:calc(var(--u)*.5) calc(var(--u)*.35)}
+.krt td{font-size:calc(var(--u)*1.5);padding:calc(var(--u)*.5) calc(var(--u)*.35)}
+.krt td.p{font-size:calc(var(--u)*2.2)}
+.krt td.p small{font-size:.42em}
+.sd{width:calc(var(--u)*1.05);height:calc(var(--u)*1.05);margin:0 calc(var(--u)*.12)}
 </style>
 </head>
 <body>
@@ -318,11 +340,16 @@ try{Object.assign(LT,JSON.parse(localStorage.getItem('wsk-lt-v2')||'{}'),{conn:f
 const saveLT=()=>{try{localStorage.setItem('wsk-lt-v2',JSON.stringify({delay:LT.delay,anchor:LT.anchor,manual:LT.manual,manualAt:LT.manualAt,state:LT.state,last:LT.last}))}catch(e){}};
 E.forEach((e,i)=>e.id=i);
 const strip=h=>String(h||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
-function liveClass(t){const u=' '+t.toUpperCase().replace(/[^A-Z0-9]+/g,' ')+' ';
- if(/ OKN ?J(UNIOR)? | OK N JUNIOR /.test(u))return 'OKNJ';
+function liveClass(t){
+ // Normalise the way Apex writes classes: "OK-N", "OK-N Junior", "OK-NJ", "OKN-J", "OK Junior", "OK-J"...
+ let u=' '+String(t).toUpperCase().replace(/[^A-Z0-9]+/g,' ')+' ';
+ u=u.replace(/ OK N(?= )/g,' OKN').replace(/ OK NJ(?= )/g,' OKNJ').replace(/ OKN J(UNIOR)?(?= )/g,' OKNJ')
+    .replace(/ OK J(UNIOR)?(?= )/g,' OKJ').replace(/ OK JUNIOR(?= )/g,' OKJ');
+ if(/ OKNJ /.test(u))return 'OKNJ';
  if(/ OKN /.test(u))return 'OKN';
- if(/ OKJ | OK J(UNIOR)? | OK JUNIOR /.test(u))return 'OKJ';
- if(/ OK /.test(u))return 'OK';return null}
+ if(/ OKJ /.test(u))return 'OKJ';
+ if(/ OK /.test(u))return 'OK';
+ return null}
 // adjusted start/end for every event, from measured delay (or manual override)
 function adjust(now){
  const td=todayD(now);
@@ -350,7 +377,7 @@ function parseTitle(t){const u=' '+t.toUpperCase().replace(/[–—]/g,'-').repl
  if(m=u.match(/\bM\s?([123])\b/))r.heat='M'+m[1];
  if(r.sec==='Prefinals'&&(m=u.match(/PRE ?-?FINAL[E]?\s+([AB])\b/)))r.heat=m[1];
  if(m=u.match(/\b(7\d\d)\s*-\s*(7\d\d)\b/))r.grp='701–768';else if(/\b77\d\s*-\s*9\d\d\b/.test(u))r.grp='776–924';
- if(m=u.match(/TURN\s*(\d)|TURNO\s*(\d)|SESSION\s*(\d)/))r.turn=m[1]||m[2]||m[3];
+ if(m=u.match(/(?:TURN|TURNO|SESSION|FREE PRACTICE|PRACTICE|PROVE LIBERE)\s*(\d)/))r.turn=m[1];
  return r}
 function startSession(cls,title,at){
  const p=parseTitle(title);
@@ -370,6 +397,8 @@ function startSession(cls,title,at){
  const joined=Date.now()-(LT.connAt||0)<5000;
  LT.state[ev.id]={start:at,title,joined,fix:false};
  if(!joined){LT.delay[ev.d]=Math.round((at-ev.at)/60000);LT.anchor[ev.d]=ev.at}
+ LT.sess=Object.assign(LT.sess||{},{ev:ev.id});
+ if(joined&&LT.remain!=null&&Date.now()-LT.remainAt<10000)fixStart(Math.max(0,LT.remain-(Date.now()-LT.remainAt)));
  LT.manual=null;LT.sess=Object.assign(LT.sess||{},{ev:ev.id});saveLT();
 }
 // If the page opened while a session was already running, work out its real start from the time left
@@ -396,7 +425,7 @@ function handle(k,a,v){
   case 'title2':LT.t2=v;onTitle();break;
   case 'title':LT.t1=v;LT.t2='';onTitle();break;
   case 'light':LT.light=a;if(a==='lg')maybeStart();if(a==='lf'&&LT.sess&&LT.sess.ev!=null){snapshotResults();endSession(Date.now())}break;
-  default:if(/^r\d+c\d+$/.test(k)){G.cells[k]=strip(v);break}if(/^r\d+$/.test(k)&&a==='#'&&G.rows[k]){G.rows[k].pos=Number(v)||G.rows[k].pos;break}break;
+  default:if(/^r\d+c\d+$/.test(k)){G.cells[k]=strip(v);G.cls[k]=a;break}if(/^r\d+$/.test(k)&&a==='#'&&G.rows[k]){G.rows[k].pos=Number(v)||G.rows[k].pos;break}break;
   case 'dyn1':if(a==='countdown'){const ms=Number(v);if(!isNaN(ms)){
      if(LT.lastCd!=null&&ms<LT.lastCd&&LT.light!=='lr')maybeStart();
      LT.lastCd=ms;LT.remain=ms;LT.remainAt=Date.now();fixStart(ms)}}break;
@@ -404,20 +433,21 @@ function handle(k,a,v){
 }
 
 // ---------- Live timing grid: positions of KR drivers ----------
-const G={mode:'',cols:{},rows:{},cells:{},stamp:0};
+const G={mode:'',cols:{},rows:{},cells:{},cls:{},stamp:0};
 const KRNUM={};for(const c in KR)KR[c].forEach(d=>KRNUM[d[0]]={c,name:d[2],first:d[1]});
 function parseGrid(html){
  const doc=new DOMParser().parseFromString('<table>'+html+'</table>','text/html');
- G.cols={};G.rows={};G.cells={};
+ G.cols={};G.rows={};G.cells={};G.cls={};
  const trs=[...doc.querySelectorAll('tr')];if(!trs.length)return;
  const head=trs.find(t=>t.classList.contains('head'))||trs[0];
  [...head.children].forEach(td=>{const ty=td.getAttribute('data-type'),id=td.getAttribute('data-id');if(ty&&id)G.cols[ty]=id});
  trs.forEach(tr=>{const id=tr.getAttribute('data-id');if(!id||tr===head||tr.classList.contains('progress_lap')||tr.classList.contains('head'))return;
   G.rows[id]={pos:Number(tr.getAttribute('data-pos'))||0,start:Number(tr.getAttribute('data-pos'))||0};
-  tr.querySelectorAll('[data-id]').forEach(td=>{G.cells[td.getAttribute('data-id')]=td.textContent.replace(/\s+/g,' ').trim()})});
+  tr.querySelectorAll('[data-id]').forEach(td=>{const k=td.getAttribute('data-id');G.cells[k]=td.textContent.replace(/\s+/g,' ').trim();G.cls[k]=((td.className||'').match(/\b(tb|ti|tn|to|tr)\b/)||[''])[0]})});
  G.stamp=Date.now();
 }
 const cell=(rid,ty)=>G.cols[ty]?(G.cells[rid+G.cols[ty]]||''):'';
+const sect=(rid,ty)=>{if(!G.cols[ty])return null;const k=rid+G.cols[ty];return G.cells[k]?(G.cls[k]||'x'):''};
 const lapSec=t=>{t=String(t).trim().replace(',','.');let m=t.match(/^(\d+):(\d{1,2}(?:\.\d+)?)$/);if(m)return +m[1]*60+ +m[2];m=t.match(/^\d+(?:\.\d+)?$/);return m?+t:null};
 function krRows(){
  const ids=Object.keys(G.rows),total=ids.length;if(!total)return {total:0,rows:[]};
@@ -429,16 +459,16 @@ function krRows(){
   if(pos===1)gap='P1';
   else if(G.mode==='r'){gap=cell(id,'gap')||'';if(/^\d+(\.\d+)?$/.test(gap))gap='+'+gap}
   else{const b=lapSec(best);gap=(b!=null&&p1best!=null)?'+'+(b-p1best).toFixed(3):(cell(id,'gap')||'')}
-  rows.push({id,no,c:k.c,name:k.name,pos,best,last,gap,start:G.rows[id].start})});
+  rows.push({id,no,c:k.c,name:k.name,pos,best,last,gap,start:G.rows[id].start,sec:['s1','s2','s3'].map(t=>sect(id,t)),laps:cell(id,'tlp')})});
  rows.sort((a,b)=>a.pos-b.pos);return {total,rows};
 }
-function snapshotResults(){const r=krRows();if(LT.sess&&r.rows.length&&!(LT.last&&LT.last.title===LT.sess.title&&Date.now()-LT.last.at<5000&&!r.total)){LT.last={title:LT.sess.title,at:Date.now(),total:r.total,race:G.mode==='r',rows:r.rows.map(x=>({no:x.no,c:x.c,name:x.name,pos:x.pos,best:x.best,gap:x.gap}))};saveLT()}}
+function snapshotResults(){const r=krRows();if(LT.sess&&r.rows.length&&!(LT.last&&LT.last.title===LT.sess.title&&Date.now()-LT.last.at<5000&&!r.total)){LT.last={title:LT.sess.title,at:Date.now(),total:r.total,race:G.mode==='r',rows:r.rows.map(x=>({no:x.no,c:x.c,name:x.name,pos:x.pos,best:x.best,gap:x.gap,laps:x.laps}))};saveLT()}}
 const krEl=document.getElementById('kr');
 function renderKR(now){
  const r=krRows(),liveSess=LT.sess,light=LT.light;
  const rem=LT.remain!=null?Math.max(0,LT.remain-(now-LT.remainAt)):null;
- const table=(rows,total,live)=>`<table class="krt"><thead><tr><th>Pos</th><th>#</th><th>Driver</th><th>${(live?G.mode==='r':LT.last&&LT.last.race)?'Gap P1':'Δ P1'}</th><th>Best lap</th></tr></thead><tbody>${
-  rows.map(x=>`<tr class="${live&&x.start&&x.pos<x.start?'up':live&&x.start&&x.pos>x.start?'dn':''}"><td class="p">P${x.pos}<small>/${total}</small></td><td class="n" style="--c:${COL[x.c]}"><span>${x.no}</span></td><td class="d">${esc(x.name)}</td><td class="g${x.gap==='P1'?' lead':''}">${x.gap==='P1'?'Leader':esc(x.gap||'–')}</td><td class="b">${esc(x.best||'–')}</td></tr>`).join('')}</tbody></table>`;
+ const table=(rows,total,live)=>`<table class="krt"><thead><tr><th>Pos</th><th>#</th><th>Driver</th>${live&&G.cols.s1?'<th class="sx">Sectors</th>':''}<th>${(live?G.mode==='r':LT.last&&LT.last.race)?'Gap P1':'Δ P1'}</th><th>Best lap</th><th class="lp">Laps</th></tr></thead><tbody>${
+  rows.map(x=>`<tr class="${live&&x.start&&x.pos<x.start?'up':live&&x.start&&x.pos>x.start?'dn':''}"><td class="p">P${x.pos}<small>/${total}</small></td><td class="n" style="--c:${COL[x.c]}"><span>${x.no}</span></td><td class="d">${esc(x.name)}</td>${live&&G.cols.s1?`<td class="sx">${(x.sec||[]).map(c=>`<i class="sd ${c||''}"></i>`).join('')}</td>`:''}<td class="g${x.gap==='P1'?' lead':''}">${x.gap==='P1'?'Leader':esc(x.gap||'–')}</td><td class="b">${esc(x.best||'–')}</td><td class="lp">${esc(x.laps||'–')}</td></tr>`).join('')}</tbody></table>`;
  let html;
  if(liveSess&&Object.keys(G.rows).length){
   html=`<div class="krh"><span class="flag ${esc(light)}"></span><b>KR drivers · live</b>${rem!=null?`<span class="rt">${dur(rem)}</span>`:''}</div>
