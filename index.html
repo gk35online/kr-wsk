@@ -241,7 +241,7 @@ const E=[];
 const add=(d,t,cls,sec,label,dur,extra)=>E.push({d,t,cls:[].concat(cls),sec,label,dur,extra:extra||''});
 // Free practice Wed & Thu, 4 turns x 10'
 const fp={OKN:[['All','08:00','10:23','12:46','15:09']],
- OKNJ:[['701–768','08:13','10:36','12:59','15:22'],['776–924','08:26','10:49','13:12','15:35']],
+ OKNJ:[['701–775','08:13','10:36','12:59','15:22'],['776–924','08:26','10:49','13:12','15:35']],
  OKJ:[['Odd numbers','09:31','11:54','14:17','16:40'],['Even numbers','09:44','12:07','14:30','16:53']],
  OK:[['All','09:57','12:20','14:43','17:06']]};
 for(const d of [25,26])for(const c in fp)for(const [g,...ts] of fp[c])ts.forEach((t,i)=>add(d,t,c,'Free practice',`Free practice · turn ${i+1}`,10,g));
@@ -252,15 +252,15 @@ add(26,'16:00',['OKN','OKNJ'],'Admin','Drivers’ briefing',20,'Briefing point')
 add(26,'16:20',['OK','OKJ'],'Admin','Administrative check & pass',90,'Race secretary');
 add(26,'17:30','OKJ','Admin','Drivers’ briefing',20,'Briefing point');
 // Friday
-add(27,'08:00','OK','Admin','Scrutineering & tyre delivery',90,'Parc fermé');
-[['08:00','OKN','All'],['08:08','OKNJ','Group 1'],['08:16','OKNJ','Group 2'],['09:04','OKJ','Group 1'],['09:12','OKJ','Group 2'],['09:20','OK','Group 1'],['09:28','OK','Group 2']]
+add(27,'08:00','OK','Admin','Scrutineering & tyre delivery',120,'Parc fermé');
+[['08:40','OKN','All'],['08:48','OKNJ','Group 1'],['08:56','OKNJ','Group 2'],['09:44','OKJ','Group 1'],['09:52','OKJ','Group 2'],['10:00','OK','Group 1'],['10:08','OK','Group 2']]
  .forEach(([t,c,g])=>add(27,t,c,'Official free practice','Official free practice 5’',5,g));
-[['09:50','OKN','All'],['10:00','OKNJ','Group 1'],['10:10','OKNJ','Group 2'],['11:10','OKJ','Group 1'],['11:20','OKJ','Group 2'],['11:30','OK','Group 1'],['11:40','OK','Group 2']]
+[['10:30','OKN','All'],['10:40','OKNJ','Group 1'],['10:50','OKNJ','Group 2'],['11:50','OKJ','Group 1'],['12:00','OKJ','Group 2'],['12:10','OK','Group 1'],['12:20','OK','Group 2']]
  .forEach(([t,c,g])=>add(27,t,c,'Qualifying','Timed practice 6’',6,g));
 const heat=(d,list)=>list.forEach(([t,c,g])=>add(d,t,c,'Heats',`Heat ${g}`,15,'race'));
 heat(27,[['12:40','OKN','M1'],['13:00','OKNJ','A–B'],['13:20','OKNJ','C–D'],['14:40','OKJ','A–B'],['15:00','OKJ','C–D'],['15:20','OK','A–B'],['15:40','OK','C–D']]);
 // Saturday
-[['08:00','OKN','All'],['08:08','OKNJ','701–768'],['08:16','OKNJ','776–924'],['08:56','OKJ','Odd numbers'],['09:04','OKJ','Even numbers'],['09:12','OK','All']]
+[['08:00','OKN','All'],['08:08','OKNJ','701–775'],['08:16','OKNJ','776–924'],['08:56','OKJ','Odd numbers'],['09:04','OKJ','Even numbers'],['09:12','OK','All']]
  .forEach(([t,c,g])=>add(28,t,c,'Warm up','Warm up 5’',5,g));
 heat(28,[['09:30','OKN','M2'],['09:50','OKNJ','A–C'],['10:10','OKNJ','B–D'],['11:30','OKJ','A–C'],['11:50','OKJ','B–D'],['12:10','OK','A–C'],['12:30','OK','B–D'],
  ['13:10','OKN','M3'],['13:30','OKNJ','A–D'],['13:50','OKNJ','B–C'],['15:10','OKJ','A–D'],['15:30','OKJ','B–C'],['15:50','OK','A–D'],['16:10','OK','B–C']]);
@@ -276,9 +276,9 @@ heat(28,[['09:30','OKN','M2'],['09:50','OKNJ','A–C'],['10:10','OKNJ','B–D'],
   'MINI GR3':[['Odd numbers','09:05','11:28','13:51','16:14'],['Even numbers','09:18','11:41','14:04','16:27']],
   'KZ2':[['All','10:10','12:33','14:56','17:19']]};
  for(const d of [25,26])for(const c in fpo)for(const [g,...ts] of fpo[c])ts.forEach((t,i)=>H(d,t,c,'Free practice',`Free practice · turn ${i+1}`,c==='KZ2'&&i===3?8:10,g));
- [['08:24','MINI U10','Group 1'],['08:32','MINI U10','Group 2'],['08:40','MINI U10','Group 3'],['08:48','MINI GR3','Group 1'],['08:56','MINI GR3','Group 2'],['09:36','KZ2','Group 1']]
+ [['09:04','MINI U10','Group 1'],['09:12','MINI U10','Group 2'],['09:20','MINI U10','Group 3'],['09:28','MINI GR3','Group 1'],['09:36','MINI GR3','Group 2'],['10:16','KZ2','Group 1']]
   .forEach(([t,c,g])=>H(27,t,c,'Official free practice','Official free practice 5’',5,g));
- [['10:20','MINI U10','Group 1'],['10:30','MINI U10','Group 2'],['10:40','MINI U10','Group 3'],['10:50','MINI GR3','Group 1'],['11:00','MINI GR3','Group 2'],['11:50','KZ2','Group 1']]
+ [['11:00','MINI U10','Group 1'],['11:10','MINI U10','Group 2'],['11:20','MINI U10','Group 3'],['11:30','MINI GR3','Group 1'],['11:40','MINI GR3','Group 2'],['12:30','KZ2','Group 1']]
   .forEach(([t,c,g])=>H(27,t,c,'Qualifying','Timed practice 6’',6,g));
  const hh=(d,l)=>l.forEach(([t,c,g])=>H(d,t,c,'Heats',`Heat ${g}`,12,'race'));
  hh(27,[['13:40','MINI U10','C–E'],['13:55','MINI U10','B–D'],['14:10','MINI GR3','A–B'],['14:25','MINI GR3','C–D'],['16:00','KZ2','M1'],['16:20','MINI U10','A–E'],['16:35','MINI U10','C–D']]);
@@ -306,9 +306,15 @@ const KR={OKN:[[857,'Nat','Johnstone']],
  OK:[[242,'Huifei','Xie'],[243,'Oliveri','Sini'],[244,'Santiago','Diaz de la Vega'],[272,'Max','Weiland']],
  OKJ:[[335,'Lorenzo','Di Pietrantonio'],[350,'Niccolò','Perico'],[372,'Will','Green']]};
 // Which KR drivers run in a session. tbc = groups decided by the organisers (series, heats, prefinals)
-const krFor=(e,c)=>{const g=e.extra,all=KR[c]||[];
- const f=g==='701–768'?n=>n>=701&&n<=768:g==='776–924'?n=>n>=776&&n<=924:g==='Odd numbers'?n=>n%2===1:g==='Even numbers'?n=>n%2===0:null;
- return {list:f?all.filter(d=>f(d[0])):all,tbc:!f&&g!=='All'&&!/^grid/.test(g)&&e.sec!=='Admin'}};
+// Friday series groups (official free practice + timed practice), from the team's group list. OKN runs as one group.
+const SERIES={OKJ:{350:1,335:2,372:2},OK:{242:1,244:1,243:2,272:2},OKNJ:{739:1,754:1,909:1,702:2,704:2,737:2},'MINI U10':{503:3}};
+const HEATG={OKNJ:{702:'B',704:'B',737:'D',739:'C',754:'A',909:'A'},OKJ:{350:'C',372:'B',335:'D'},OK:{242:'D',243:'A',244:'B',272:'A'},'MINI U10':{503:'D'}};
+const krFor=(e,c)=>{const g=e.extra,all=KR[c]||[],sg=(g||'').match(/^Group (\d)$/),hp=e.sec==='Heats'&&(e.label||'').match(/^Heat ([A-E])–([A-E])$/);
+ const f=g==='701–775'?n=>n>=701&&n<=775:g==='776–924'?n=>n>=776&&n<=924:g==='Odd numbers'?n=>n%2===1:g==='Even numbers'?n=>n%2===0
+  :sg&&SERIES[c]?n=>SERIES[c][n]===Number(sg[1])
+  :hp&&HEATG[c]&&all.every(d=>HEATG[c][d[0]])?n=>hp.slice(1).includes(HEATG[c][n]):null;
+ const allIn=e.sec==='Heats'&&/^Heat M\d$/.test(e.label);
+ return {list:f?all.filter(d=>f(d[0])):all,tbc:!f&&!allIn&&g!=='All'&&!/^grid/.test(g)&&e.sec!=='Admin'}};
 const isG=e=>!!e.extra&&e.extra!=='race'&&!e.extra.startsWith('grid')&&e.sec!=='Admin';
 const DAY3={25:'Wed',26:'Thu',27:'Fri',28:'Sat',29:'Sun'};
 const cols=document.getElementById('cols'),nx=document.getElementById('nx');
@@ -385,6 +391,15 @@ function adjust(now){
   e.dl=d;e.s=e.at+d*60000;e.f=e.s+e.dur*60000;
   const st=LT.state[e.id];
   if(st&&st.start){e.s=st.start;e.f=st.end||Math.max(st.start+e.dur*60000,now+60000);e.liveNow=!st.end}else e.liveNow=false;});
+ // While the live timing is connected: a session that is due but has not gone green is "waiting".
+ // The delay then grows minute by minute and everything after it moves back.
+ E.forEach(e=>e.wait=false);LT.liveLate=null;
+ if(LT.conn&&LT.manual==null&&!E.some(e=>e.liveNow)){
+  const W=E.filter(e=>e.sec!=='Admin'&&!LT.state[e.id]&&e.d===td&&e.s<=now&&now-e.s<30*60000).sort((a,b)=>b.s-a.s)[0];
+  if(W){const extra=now-W.s;
+   E.forEach(e=>{if(e.sec!=='Admin'&&!LT.state[e.id]&&e.d===W.d&&e.s>=W.s){e.s+=extra;e.f+=extra;e.dl=Math.round((e.s-e.at)/60000)}});
+   W.wait=true;LT.liveLate=Math.max(0,Math.round((now-W.at)/60000));}
+ }
 }
 // Read session type and group from the live-timing title (English or Italian wording)
 function parseTitle(t){const u=' '+t.toUpperCase().replace(/[–—]/g,'-').replace(/\s+/g,' ')+' ';const r={};
@@ -523,7 +538,7 @@ function connectLT(){let ws;
 const hm=ms=>fmt.format(ms).slice(0,5);
 const ltBar=document.getElementById('lt'),toast=document.getElementById('toast');
 function renderLT(now){
- const td=todayD(now),man=LT.manual!=null,dl=man?LT.manual:(LT.delay[td]||0);
+ const td=todayD(now),man=LT.manual!=null,dl=man?LT.manual:(LT.liveLate!=null?Math.max(LT.delay[td]||0,LT.liveLate):(LT.delay[td]||0));
  const on=LT.sess&&LT.sess.ev!=null&&LT.state[LT.sess.ev]&&!LT.state[LT.sess.ev].end?E[LT.sess.ev]:null;
  const rem=LT.remain!=null&&on?Math.max(0,LT.remain-(now-LT.remainAt)):null;
  ltBar.className='lt'+(LT.conn?' ok':'')+(dl>0?' late':'');
@@ -558,7 +573,7 @@ function tick(){
  cols.innerHTML=CL.map(c=>{
   const tr=E.filter(e=>e.cls.includes(c)&&e.sec!=='Admin'&&e.f>now).sort((a,b)=>a.s-b.s),cur=tr[0],n2=tr[1];
   if(!cur)return `<section class="col" style="--c:${COL[c]}"><div class="hd"><span class="cls">${c}</span><span class="what">Weekend complete</span></div><div></div><div></div><div></div><div></div></section>`;
-  const live=cur.s<=now,soon=!live&&cur.s-now<300000,timed=cur.liveNow;
+  const wait=!!cur.wait,live=!wait&&cur.s<=now,soon=wait||(!live&&cur.s-now<300000),timed=cur.liveNow;
   const day=cur.d===todayD(now)?'Today':DAY3[cur.d];
   const note=cur.extra==='race'?`pre-grid closes ${hm(cur.s-300000)}`:cur.extra.startsWith('grid')?`grid forms ${hm(cur.s-300000)}`:cur.note;
   const rem=timed&&LT.remain!=null&&LT.sess&&LT.sess.ev===cur.id?Math.max(0,LT.remain-(now-LT.remainAt)):null;
@@ -566,7 +581,7 @@ function tick(){
    <div class="hd"><span class="cls">${c}</span><span class="what">${esc(cur.label)}</span></div>
    <div class="meta">${isG(cur)&&cur.extra!=='All'?`<span class="grp g">${esc(cur.extra)}</span>`:note&&!isG(cur)?`<span class="grp">${esc(note)}</span>`:''}<span class="when">${day} · ${tm(cur)}${cur.dl&&!live?` <span class="est">est.</span>`:''}</span></div>
    ${(k=>`<div class="drv">${k.list.length?k.list.map(d=>`<span><b>${d[0]}</b>${esc(d[2])}</span>`).join(''):'<em>No KR drivers in this group</em>'}</div>`)(krFor(cur,c))}
-   <div class="cdrow"><div class="cd">${live?dur(rem!=null?rem:cur.f-now):dur(cur.s-now)}</div><div class="state"><span class="dot"></span>${live?(timed?'On track · live':(cur.extra==='race'||cur.extra.startsWith('grid')?'Racing · est.':'On track')):soon?'Starting soon':cur.dl?'Until start · adj.':'Until start'}</div></div>
+   <div class="cdrow"><div class="cd">${wait?'+'+dur(now-cur.at):live?dur(rem!=null?rem:cur.f-now):dur(cur.s-now)}</div><div class="state"><span class="dot"></span>${wait?'Late · waiting for start':live?(timed?'On track · live':(cur.extra==='race'||cur.extra.startsWith('grid')?'Racing · est.':'On track')):soon?'Starting soon':cur.dl?'Until start · adj.':'Until start'}</div></div>
    <div class="then">${n2?`Then <b>${esc(n2.label)}${isG(n2)&&n2.extra!=='All'?' · '+esc(n2.extra):''}</b> · ${n2.d===todayD(now)?'':DAY3[n2.d]+' '}${hm(n2.s)}`:'Last session'}</section>`}).join('');
  nx.innerHTML=E.filter(e=>!e.hid&&e.sec!=='Admin'&&e.s>now).sort((a,b)=>a.s-b.s).slice(0,8).map(e=>
   `<div><b>${e.d===todayD(now)?'':DAY3[e.d]+' '}${hm(e.s)}</b><span class="tag" style="--c:${COL[e.cls[0]]}">${e.cls[0]}</span>${esc(e.label)}${isG(e)&&e.extra!=='All'?' · '+esc(e.extra):''}</div>`).join('');
